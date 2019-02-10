@@ -9,7 +9,7 @@ with open("config.yml", "r") as cfgfile:
 
 # Assign initial api key
 API_KEY = cfg["api_key"].pop()
-ticker_list = ["APRN", "JD", "TEAM", "CRM", "KO", "KHC"]
+ticker_list = ["APRN", "JD", "TEAM", "CRM", "KO", "KHC", "LQD",]
 
 # Alpha Vantage URL
 API_URL = "https://www.alphavantage.co/query"
@@ -32,5 +32,5 @@ for ticker in ticker_list:
         print(download_price(ticker=ticker, api_key=API_KEY))
     except:
         # Alpha Vantage limits the number of API calls per minute.
-        time.sleep(65)
+        time.sleep(61)
         print(download_price(ticker=ticker, api_key=API_KEY))

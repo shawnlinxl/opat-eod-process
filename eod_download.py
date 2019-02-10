@@ -32,5 +32,5 @@ for ticker in ticker_list:
         print(download_price(ticker=ticker, api_key=API_KEY))
     except:
         # Alpha Vantage limits the number of API calls per minute.
-        time.sleep(61)
+        time.sleep(60)
         print(download_price(ticker=ticker, api_key=API_KEY))

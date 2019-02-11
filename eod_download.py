@@ -68,7 +68,7 @@ def download_price(ticker, api_key, proxy):
         data['Time Series (Daily)'], orient="index", dtype="float")
 
     # Assign date index to its own column
-    data["date"] = pd.to_datetime(data.index, format="%Y-%m-%d")
+    data["tradeday"] = pd.to_datetime(data.index, format="%Y-%m-%d")
 
     # Add ticker to a new column
     data["ticker"] = ticker

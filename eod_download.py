@@ -31,6 +31,12 @@ PROXY_LIST = pd.read_sql_query(
     sql="SELECT proxy FROM config.proxy_list", con=DB_CON)
 PROXY_LIST = PROXY_LIST["proxy"].values
 
+# Ticker list to query data for
+TICKER_LIST = pd.read_sql_query(
+    sql="SELECT Symbol FROM config.constituents_sp500", con=DB_CON)
+TICKER_LIST = TICKER_LIST["Symbol"].values
+
+
 # Functions
 # -------------------------------------------------
 # Print iterations progress
@@ -53,24 +59,6 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
     # Print New Line on Complete
     if iteration == total: 
         print()
-
-# use only fast proxy
-PROXY_USE = list()
-print("--------------------Testing Proxies--------------------")
-l = len(PROXY_LIST)
-printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
-for i, proxy in enumerate(PROXY_LIST):
-    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
-    try:
-        requests.get("http://"+proxy, timeout=0.2)
-        PROXY_USE.append(proxy)
-    except:
-        pass
-
-# Tickers to download
-ticker_list = ["APRN", "JD", "TEAM", "CRM", "KO",
-               "KHC", "LQD", "DIS", "FB", "GOOGL", "STZ"]
-
 
 def download_price(ticker, api_key, proxy):
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
@@ -117,11 +105,30 @@ def download_price(ticker, api_key, proxy):
 
     return(data)
 
+# Main
+# -------------------------------------------------
+# use only fast proxy
+PROXY_USE = list()
+print("--------------------Testing Proxies--------------------")
+l = len(PROXY_LIST)
+printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+for i, proxy in enumerate(PROXY_LIST):
+    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    try:
+        requests.get("http://"+proxy, timeout=0.2)
+        PROXY_USE.append(proxy)
+    except:
+        pass
+
 
 # Download data
+print("--------------------Downloading Data--------------------")
 proxy = random.choice(PROXY_USE)
-for ticker in ticker_list:
+l = len(TICKER_LIST)
+printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+for i, ticker in enumerate(TICKER_LIST):
     success = False
+    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
     while not success:
         try:
             price_series = download_price(

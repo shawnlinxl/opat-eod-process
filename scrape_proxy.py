@@ -26,7 +26,8 @@ soup = BeautifulSoup(res.text, "lxml")
 result = list()
 for items in soup.select("tbody tr"):
     proxy_list = ':'.join([item.text for item in items.select("td")[:2]])
-    result.append(proxy_list)
+    if items.select("td")[4].text == "elite proxy":
+        result.append(proxy_list)
 
 result = pd.DataFrame(
     data={'proxy': result, 'modified': datetime.datetime.now()})

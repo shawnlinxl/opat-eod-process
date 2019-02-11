@@ -28,7 +28,7 @@ API_URL = "https://www.alphavantage.co/query"
 
 # Proxy to mask ip
 PROXY_LIST = pd.read_sql_query(
-    sql="SELECT proxy FROM config.proxy_list", con=DB_CON)
+    sql="SELECT DISTINCT proxy FROM config.proxy_list", con=DB_CON)
 PROXY_LIST = PROXY_LIST["proxy"].values
 
 # Ticker list to query data for

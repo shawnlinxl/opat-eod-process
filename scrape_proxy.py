@@ -29,6 +29,16 @@ for items in soup.select("tbody tr"):
     if items.select("td")[4].text == "elite proxy":
         result.append(proxy_list)
 
+res = requests.get('https://www.us-proxy.org/',
+                   headers={'User-Agent': 'Mozilla/5.0'})
+soup = BeautifulSoup(res.text, "lxml")
+for items in soup.select("tbody tr"):
+    proxy_list = ':'.join([item.text for item in items.select("td")[:2]])
+    if items.select("td")[4].text == "elite proxy":
+        result.append(proxy_list)
+
+
+
 result = pd.DataFrame(
     data={'proxy': result, 'modified': datetime.datetime.now()})
 

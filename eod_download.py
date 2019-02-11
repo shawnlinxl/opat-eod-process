@@ -31,6 +31,15 @@ PROXY_LIST = pd.read_sql_query(
     sql="SELECT proxy FROM config.proxy_list", con=DB_CON)
 PROXY_LIST = PROXY_LIST["proxy"].values
 
+# use only fast proxy
+PROXY_USE = list()
+for proxy in PROXY_LIST:
+    try:
+        requests.get("http://"+proxy, timeout=0.2)
+        PROXY_USE.append(proxy)
+    except:
+        pass
+
 # Tickers to download
 ticker_list = ["APRN", "JD", "TEAM", "CRM", "KO",
                "KHC", "LQD", "DIS", "FB", "GOOGL", "STZ"]
@@ -83,12 +92,11 @@ def download_price(ticker, api_key, proxy):
 
 
 # Download data
+proxy = random.choice(PROXY_USE)
 for ticker in ticker_list:
     success = False
     while not success:
         try:
-            print(ticker)
-            proxy = random.choice(PROXY_LIST)
             price_series = download_price(
                 ticker=ticker, api_key=API_KEY, proxy=proxy)
             price_series.to_sql(name="eod_stock_history",
@@ -97,4 +105,5 @@ for ticker in ticker_list:
                   "---- is written to price_data.eod_stock_history.")
             success = True
         except:
+            proxy = random.choice(PROXY_USE)
             pass

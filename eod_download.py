@@ -3,8 +3,7 @@ import yaml
 import pandas as pd
 import time
 import datetime
-
-from sqlalchemy import create_engine
+import sqlalchemy as db 
 
 # Load configuration file
 with open("config.yml", "r") as cfgfile:
@@ -13,15 +12,16 @@ with open("config.yml", "r") as cfgfile:
 # Configurations
 # -------------------------------------------------
 # API key for Alpha Vantage
-API_KEY = cfg["api_key"].pop()
+API_KEY = 1
 # Database
 USER = cfg["mysql"]["user"]
 PASSWORD = cfg["mysql"]["password"]
 HOST = cfg["mysql"]["host"]
 PORT = cfg["mysql"]["port"]
-DATABASE = cfg["mysql"]["database"]
-DB_CON = create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{database}".format(
-    user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE))
+DATABASE = "price_data"
+DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{database}".format(
+    user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE)).connect()
+
 # Alpha Vantage URL
 API_URL = "https://www.alphavantage.co/query"
 

@@ -3,7 +3,8 @@ import yaml
 import pandas as pd
 import time
 import datetime
-import sqlalchemy as db 
+import sqlalchemy as db
+import random
 
 # Load configuration file
 with open("config.yml", "r") as cfgfile:
@@ -25,20 +26,30 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # Alpha Vantage URL
 API_URL = "https://www.alphavantage.co/query"
 
+# Proxy to mask ip
+PROXY_LIST = pd.read_sql_query(
+    sql="SELECT proxy FROM config.proxy_list", con=DB_CON)
+PROXY_LIST = PROXY_LIST["proxy"].values
+
 # Tickers to download
 ticker_list = ["APRN", "JD", "TEAM", "CRM", "KO",
                "KHC", "LQD", "DIS", "FB", "GOOGL", "STZ"]
 
 
-def download_price(ticker, api_key):
+def download_price(ticker, api_key, proxy):
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
               "symbol": ticker,
               "outputsize": "full",
               "datatype": "json",
               "apikey": api_key}
 
+    # Request proxy
+    proxy = "http://" + proxy
+    proxy = {"http": proxy,
+             "https": proxy}
+
     # Request data from alpha vantage
-    r = requests.get(url=API_URL, params=PARAMS)
+    r = requests.get(url=API_URL, params=PARAMS, proxies=proxy, timeout=5)
 
     # Serialize result into json
     data = r.json()
@@ -73,18 +84,17 @@ def download_price(ticker, api_key):
 
 # Download data
 for ticker in ticker_list:
-    try:
-        price_series = download_price(ticker=ticker, api_key=API_KEY)
-        price_series.to_sql(name="eod_stock_history",
-                            con=DB_CON, if_exists="append", index=False)
-        print(datetime.datetime.now(), "----", ticker,
-              "---- is written to price_data.eod_stock_history.")
-    except:
-        # Alpha Vantage limits the number of API calls per minute.
-        time.sleep(60)
-
-        price_series = download_price(ticker=ticker, api_key=API_KEY)
-        price_series.to_sql(name="eod_stock_history",
-                            con=DB_CON, if_exists="append", index=False)
-        print(datetime.datetime.now(), "----", ticker,
-              "---- is written to price_data.eod_stock_history.")
+    success = False
+    while not success:
+        try:
+            print(ticker)
+            proxy = random.choice(PROXY_LIST)
+            price_series = download_price(
+                ticker=ticker, api_key=API_KEY, proxy=proxy)
+            price_series.to_sql(name="eod_stock_history",
+                                con=DB_CON, if_exists="append", index=False)
+            print(datetime.datetime.now(), "----", ticker,
+                  "---- is written to price_data.eod_stock_history.")
+            success = True
+        except:
+            pass

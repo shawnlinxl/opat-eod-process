@@ -31,9 +31,36 @@ PROXY_LIST = pd.read_sql_query(
     sql="SELECT proxy FROM config.proxy_list", con=DB_CON)
 PROXY_LIST = PROXY_LIST["proxy"].values
 
+# Functions
+# -------------------------------------------------
+# Print iterations progress
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█'):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    # Print New Line on Complete
+    if iteration == total: 
+        print()
+
 # use only fast proxy
 PROXY_USE = list()
-for proxy in PROXY_LIST:
+print("--------------------Testing Proxies--------------------")
+l = len(PROXY_LIST)
+printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+for i, proxy in enumerate(PROXY_LIST):
+    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
     try:
         requests.get("http://"+proxy, timeout=0.2)
         PROXY_USE.append(proxy)

@@ -13,7 +13,7 @@ with open("config.yml", "r") as cfgfile:
 # Configurations
 # -------------------------------------------------
 # API key for Alpha Vantage
-API_KEY = 1
+API_KEY = cfg["api_key"][0]
 # Database
 USER = cfg["mysql"]["user"]
 PASSWORD = cfg["mysql"]["password"]
@@ -26,15 +26,10 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # Alpha Vantage URL
 API_URL = "https://www.alphavantage.co/query"
 
-# Proxy to mask ip
-PROXY_LIST = pd.read_sql_query(
-    sql="SELECT DISTINCT proxy FROM config.proxy_list", con=DB_CON)
-PROXY_LIST = PROXY_LIST["proxy"].values
-
 # Ticker list to query data for
 TICKER_LIST = pd.read_sql_query(
-    sql="SELECT Symbol FROM config.constituents_sp500", con=DB_CON)
-TICKER_LIST = TICKER_LIST["Symbol"].values
+    sql="SELECT DISTINCT Ticker FROM trading.trades", con=DB_CON)
+TICKER_LIST = TICKER_LIST["Ticker"].values
 
 
 # Functions
@@ -62,20 +57,15 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         print()
 
 
-def download_price(ticker, api_key, proxy):
+def download_price(ticker, api_key):
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
               "symbol": ticker,
               "outputsize": "full",
               "datatype": "json",
               "apikey": api_key}
 
-    # Request proxy
-    proxy = "http://" + proxy
-    proxy = {"http": proxy,
-             "https": proxy}
-
     # Request data from alpha vantage
-    r = requests.get(url=API_URL, params=PARAMS, proxies=proxy, timeout=20)
+    r = requests.get(url=API_URL, params=PARAMS, timeout=5)
 
     # Serialize result into json
     data = r.json()
@@ -110,52 +100,22 @@ def download_price(ticker, api_key, proxy):
 
 # Main
 # -------------------------------------------------
-# use only fast proxy
-PROXY_USE = list()
-print("--------------------Testing Proxies--------------------")
-l = len(PROXY_LIST)
-printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
-for i, proxy in enumerate(PROXY_LIST):
-    printProgressBar(i, l, prefix='Progress:', suffix='Complete', length=50)
-    try:
-        requests.get("http://"+proxy, timeout=0.1)
-        PROXY_USE.append(proxy)
-    except:
-        pass
-
 
 # Download data
 print("--------------------Downloading Data--------------------")
-len_proxy = len(PROXY_USE)
-print("Using", len(PROXY_USE), "proxies")
 l = len(TICKER_LIST)
 printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
-use = 0
+
 for i, ticker in enumerate(TICKER_LIST):
-    success = False
-    proxy = PROXY_USE[use]
+
     printProgressBar(i, l, prefix='Progress:', suffix='Complete', length=50)
+
+    success = False
     while not success:
         try:
-            price_series = download_price(
-                ticker=ticker, api_key=API_KEY, proxy=proxy)
+            price_series = download_price(ticker=ticker, api_key=API_KEY)
             price_series.to_sql(name="eod_stock_history",
                                 con=DB_CON, if_exists="append", index=False)
-            print(datetime.datetime.now(), "----", ticker,
-                  "---- is written to price_data.eod_stock_history.")
             success = True
-            last_success = use
         except:
-            API_KEY += 1
-
-            if use < len_proxy - 1:
-                use += 1
-            else:
-                use = 0
-
-            if use == last_success:
-                time.sleep(60)
-                print("Sleeping")
-
-            proxy = PROXY_USE[use]
-            pass
+            time.sleep(60)

@@ -40,7 +40,7 @@ TICKER_LIST = TICKER_LIST["Symbol"].values
 # Functions
 # -------------------------------------------------
 # Print iterations progress
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█'):
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█'):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -52,13 +52,15 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         length      - Optional  : character length of bar (Int)
         fill        - Optional  : bar fill character (Str)
     """
-    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    percent = ("{0:." + str(decimals) + "f}").format(100 *
+                                                     (iteration / float(total)))
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end = '\r')
+    print('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix), end='\r')
     # Print New Line on Complete
-    if iteration == total: 
+    if iteration == total:
         print()
+
 
 def download_price(ticker, api_key, proxy):
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
@@ -73,7 +75,7 @@ def download_price(ticker, api_key, proxy):
              "https": proxy}
 
     # Request data from alpha vantage
-    r = requests.get(url=API_URL, params=PARAMS, proxies=proxy, timeout=5)
+    r = requests.get(url=API_URL, params=PARAMS, proxies=proxy, timeout=20)
 
     # Serialize result into json
     data = r.json()
@@ -105,17 +107,18 @@ def download_price(ticker, api_key, proxy):
 
     return(data)
 
+
 # Main
 # -------------------------------------------------
 # use only fast proxy
 PROXY_USE = list()
 print("--------------------Testing Proxies--------------------")
 l = len(PROXY_LIST)
-printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
 for i, proxy in enumerate(PROXY_LIST):
-    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    printProgressBar(i, l, prefix='Progress:', suffix='Complete', length=50)
     try:
-        requests.get("http://"+proxy, timeout=0.2)
+        requests.get("http://"+proxy, timeout=0.1)
         PROXY_USE.append(proxy)
     except:
         pass
@@ -123,12 +126,15 @@ for i, proxy in enumerate(PROXY_LIST):
 
 # Download data
 print("--------------------Downloading Data--------------------")
-proxy = random.choice(PROXY_USE)
+len_proxy = len(PROXY_USE)
+print("Using", len(PROXY_USE), "proxies")
 l = len(TICKER_LIST)
-printProgressBar(0, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+printProgressBar(0, l, prefix='Progress:', suffix='Complete', length=50)
+use = 0
 for i, ticker in enumerate(TICKER_LIST):
     success = False
-    printProgressBar(i, l, prefix = 'Progress:', suffix = 'Complete', length = 50)
+    proxy = PROXY_USE[use]
+    printProgressBar(i, l, prefix='Progress:', suffix='Complete', length=50)
     while not success:
         try:
             price_series = download_price(
@@ -138,6 +144,18 @@ for i, ticker in enumerate(TICKER_LIST):
             print(datetime.datetime.now(), "----", ticker,
                   "---- is written to price_data.eod_stock_history.")
             success = True
+            last_success = use
         except:
-            proxy = random.choice(PROXY_USE)
+            API_KEY += 1
+
+            if use < len_proxy - 1:
+                use += 1
+            else:
+                use = 0
+
+            if use == last_success:
+                time.sleep(60)
+                print("Sleeping")
+
+            proxy = PROXY_USE[use]
             pass

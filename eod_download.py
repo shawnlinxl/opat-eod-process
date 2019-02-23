@@ -58,13 +58,19 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
 
 
 def download_price(ticker):
+    """Download price data from Alpha Vantage API
+    
+    Arguments:
+        ticker {string} -- the ticker to download price data for 
+    """
+
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
               "symbol": ticker,
               "outputsize": "full",
               "datatype": "json",
               "apikey": API_KEY}
 
-    # Request data from alpha vantage
+    # Request data from Alpha Vantage
     r = requests.get(url=API_URL, params=PARAMS, timeout=5)
 
     # Serialize result into json

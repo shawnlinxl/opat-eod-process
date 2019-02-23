@@ -1,10 +1,10 @@
-import requests
-import yaml
-import pandas as pd
-import time
 import datetime
-import sqlalchemy as db
+import time
+import pandas as pd
 import random
+import requests
+import sqlalchemy as db
+import yaml
 
 # Load configuration file
 with open("config.yml", "r") as cfgfile:

@@ -19,7 +19,7 @@ USER = cfg["mysql"]["user"]
 PASSWORD = cfg["mysql"]["password"]
 HOST = cfg["mysql"]["host"]
 PORT = cfg["mysql"]["port"]
-DATABASE = "price_data"
+DATABASE = "DW"
 DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{database}".format(
     user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE)).connect()
 
@@ -28,7 +28,7 @@ API_URL = "https://www.alphavantage.co/query"
 
 # Ticker list to query data for
 TICKER_LIST = pd.read_sql_query(
-    sql="SELECT DISTINCT Ticker FROM trading.trades", con=DB_CON)
+    sql="SELECT DISTINCT Ticker FROM DW.trades", con=DB_CON)
 TICKER_LIST = TICKER_LIST["Ticker"].values
 
 
@@ -114,7 +114,7 @@ for i, ticker in enumerate(TICKER_LIST):
     while not success:
         try:
             price_series = download_price(ticker=ticker, api_key=API_KEY)
-            price_series.to_sql(name="eod_stock_history",
+            price_series.to_sql(name="eod_price",
                                 con=DB_CON, if_exists="append", index=False)
             success = True
         except:

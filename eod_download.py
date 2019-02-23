@@ -12,8 +12,7 @@ with open("config.yml", "r") as cfgfile:
 
 # Configurations
 # -------------------------------------------------
-# API key for Alpha Vantage
-API_KEY = cfg["api_key"][0]
+
 # Database
 USER = cfg["mysql"]["user"]
 PASSWORD = cfg["mysql"]["password"]
@@ -23,7 +22,8 @@ DATABASE = "DW"
 DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{database}".format(
     user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE)).connect()
 
-# Alpha Vantage URL
+# Alpha Vantage
+API_KEY = cfg["api_key"][0]
 API_URL = "https://www.alphavantage.co/query"
 
 # Ticker list to query data for
@@ -57,12 +57,12 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
         print()
 
 
-def download_price(ticker, api_key):
+def download_price(ticker):
     PARAMS = {"function": "TIME_SERIES_DAILY_ADJUSTED",
               "symbol": ticker,
               "outputsize": "full",
               "datatype": "json",
-              "apikey": api_key}
+              "apikey": API_KEY}
 
     # Request data from alpha vantage
     r = requests.get(url=API_URL, params=PARAMS, timeout=5)
@@ -113,7 +113,7 @@ for i, ticker in enumerate(TICKER_LIST):
     success = False
     while not success:
         try:
-            price_series = download_price(ticker=ticker, api_key=API_KEY)
+            price_series = download_price(ticker=ticker)
             price_series.to_sql(name="eod_price",
                                 con=DB_CON, if_exists="append", index=False)
             success = True

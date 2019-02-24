@@ -1,7 +1,7 @@
-
-import yaml
+import datetime
+import requests
 import pandas as pd
-
+import yaml
 
 with open("./config.yml", "r") as cfgfile:
     cfg = yaml.load(cfgfile)

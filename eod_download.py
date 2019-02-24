@@ -1,8 +1,5 @@
-import datetime
 import time
 import pandas as pd
-import random
-import requests
 import sqlalchemy as db
 import yaml
 
@@ -31,13 +28,12 @@ TICKER_LIST = pd.read_sql_query(
 TICKER_LIST = TICKER_LIST["Ticker"].values
 
 # Download data
-print("--------------------Downloading Data--------------------")
+# -------------------------------------------------
 l = len(TICKER_LIST)
 progress_bar(0, l, prefix='Progress:', suffix='Complete', length=50)
 
 for i, ticker in enumerate(TICKER_LIST):
 
-    progress_bar(i, l, prefix='Progress:', suffix='Complete', length=50)
 
     success = False
     while not success:
@@ -46,5 +42,6 @@ for i, ticker in enumerate(TICKER_LIST):
             price_series.to_sql(name="eod_price",
                                 con=DB_CON, if_exists="append", index=False)
             success = True
+            progress_bar(i, l, prefix='Progress:', suffix='Complete', length=50)
         except:
             time.sleep(60)

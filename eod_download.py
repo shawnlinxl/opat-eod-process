@@ -24,8 +24,8 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 
 # Ticker list to query data for
 TICKER_LIST = pd.read_sql_query(
-    sql="SELECT DISTINCT Ticker FROM DW.trades", con=DB_CON)
-TICKER_LIST = TICKER_LIST["Ticker"].values
+    sql="SELECT DISTINCT ticker FROM DW.trades", con=DB_CON)
+TICKER_LIST = TICKER_LIST["ticker"].values
 
 # Download data
 # -------------------------------------------------
@@ -34,7 +34,6 @@ progress_bar(0, l, prefix='Progress:', suffix='Complete', length=50)
 
 for i, ticker in enumerate(TICKER_LIST):
 
-
     success = False
     while not success:
         try:
@@ -42,7 +41,8 @@ for i, ticker in enumerate(TICKER_LIST):
             price_series.to_sql(name="eod_price_archive",
                                 con=DB_CON, if_exists="append", index=False)
             success = True
-            progress_bar(i, l, prefix='Progress:', suffix='Complete', length=50)
+            progress_bar(i, l, prefix='Progress:',
+                         suffix='Complete', length=50)
         except:
             time.sleep(60)
 

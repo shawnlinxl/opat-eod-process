@@ -39,7 +39,7 @@ for i, ticker in enumerate(TICKER_LIST):
     while not success:
         try:
             price_series = download_price(ticker=ticker)
-            price_series.to_sql(name="eod_price",
+            price_series.to_sql(name="eod_price_archive",
                                 con=DB_CON, if_exists="append", index=False)
             success = True
             progress_bar(i, l, prefix='Progress:', suffix='Complete', length=50)

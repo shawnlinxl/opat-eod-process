@@ -45,3 +45,6 @@ for i, ticker in enumerate(TICKER_LIST):
             progress_bar(i, l, prefix='Progress:', suffix='Complete', length=50)
         except:
             time.sleep(60)
+
+
+progress_bar(l, l, prefix='Progress:', suffix='Complete', length=50)

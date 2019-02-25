@@ -41,10 +41,8 @@ for i, ticker in enumerate(TICKER_LIST):
             price_series.to_sql(name="eod_price_archive",
                                 con=DB_CON, if_exists="append", index=False)
             success = True
-            progress_bar(i, l, prefix='Progress:',
+            progress_bar(i+1, l, prefix='Progress:',
                          suffix='Complete', length=50)
         except:
             time.sleep(60)
 
-
-progress_bar(l, l, prefix='Progress:', suffix='Complete', length=50)

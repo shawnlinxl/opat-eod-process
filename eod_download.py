@@ -8,7 +8,7 @@ from functions.progress_bar import progress_bar
 
 # Load configuration file
 with open("config.yml", "r") as cfgfile:
-    cfg = yaml.load(cfgfile)
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
 
 # Configurations
 # -------------------------------------------------

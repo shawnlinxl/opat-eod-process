@@ -1,5 +1,10 @@
 pipeline {
   agent any
+
+  triggers {
+    cron('30 16 * * 1-5')
+  }
+
   stages {
     stage('Download EOD prices') {
       steps {

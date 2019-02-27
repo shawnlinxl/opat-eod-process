@@ -11,6 +11,7 @@ requests = "*"
 pandas = "*"
 sqlalchemy = "*"
 pymysql = "*"
+opat = "*"
 
 [requires]
 python_version = "3.7"

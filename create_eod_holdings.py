@@ -24,13 +24,14 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # -------------------------------------------------
 trades = pd.read_sql_query(
     sql="SELECT tradeday, account, ticker, action, quantity FROM DW.trades", con=DB_CON)
+splits = pd.read_sql_query(
+    sql="SELECT tradeday, ticker, close, split FROM DW.eod_price", con=DB_CON)
 
 # Create holdings
 # -------------------------------------------------
-holdings = trades.groupby("account").apply(opat.portfolio.create_holdings)
+holdings = trades.groupby("account").apply(opat.portfolio.create_holdings, splits = splits)
 holdings = holdings.reset_index()
 holdings = holdings[["tradeday", "account", "ticker", "quantity"]]
-
 
 # Write holdings to database
 # -------------------------------------------------

@@ -25,7 +25,7 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 trades = pd.read_sql_query(
     sql="SELECT tradeday, account, ticker, action, price, quantity FROM DW.trades", con=DB_CON)
 prices = pd.read_sql_query(
-    sql="SELECT tradeday, ticker, close, dividend FROM DW.eod_price", con=DB_CON)
+    sql="SELECT tradeday, ticker, close, dividend, splits FROM DW.eod_price", con=DB_CON)
 
 # Create pnl
 # -------------------------------------------------

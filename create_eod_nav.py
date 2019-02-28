@@ -1,0 +1,39 @@
+import datetime
+import pandas as pd
+import sqlalchemy as db
+import yaml
+import opat.portfolio
+
+
+# Load configuration file
+with open("config.yml", "r") as cfgfile:
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
+
+# Configurations
+# -------------------------------------------------
+
+# Database
+USER = cfg["mysql"]["user"]
+PASSWORD = cfg["mysql"]["password"]
+HOST = cfg["mysql"]["host"]
+PORT = cfg["mysql"]["port"]
+DATABASE = "DW"
+DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{database}".format(
+    user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE)).connect()
+
+# Load transactions and price data
+# -------------------------------------------------
+trades = pd.read_sql_query(
+    sql="SELECT tradeday, account, ticker, action, price, quantity FROM DW.trades WHERE account = 'XLIN02'", con=DB_CON)
+prices = pd.read_sql_query(
+    sql="SELECT tradeday, ticker, close, dividend, split FROM DW.eod_price", con=DB_CON)
+flows = pd.read_sql_query(
+    sql="SELECT tradeday, account, amount FROM DW.flows WHERE account = 'XLIN02'", con=DB_CON)
+
+# Create NAV
+# -------------------------------------------------
+nav = opat.portfolio.create_nav(trades, prices, flows)
+
+# Write NAV to database
+# -------------------------------------------------
+nav.to_sql(name="eod_nav", con=DB_CON, if_exists="replace", index=False)

@@ -24,15 +24,23 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # Load transactions and price data
 # -------------------------------------------------
 trades = pd.read_sql_query(
-    sql="SELECT tradeday, account, ticker, action, price, quantity FROM DW.trades WHERE account = 'XLIN02'", con=DB_CON)
+    sql="SELECT tradeday, account, ticker, action, price, quantity FROM DW.trades", con=DB_CON)
 prices = pd.read_sql_query(
     sql="SELECT tradeday, ticker, close, dividend, split FROM DW.eod_price", con=DB_CON)
 flows = pd.read_sql_query(
-    sql="SELECT tradeday, account, amount FROM DW.flows WHERE account = 'XLIN02'", con=DB_CON)
+    sql="SELECT tradeday, account, amount FROM DW.flows", con=DB_CON)
+
 
 # Create NAV
 # -------------------------------------------------
-nav = opat.portfolio.create_nav(trades, prices, flows)
+nav = pd.DataFrame()
+for account in flows["account"].unique():
+    trades_use = trades.copy()[trades["account"] == account]
+    flows_use = flows.copy()[flows["account"] == account]
+    nav_account = opat.portfolio.create_nav(trades_use, prices, flows_use)
+    nav_account["account"] = account
+    nav = nav.append(nav_account[["tradeday", "account", "type", "ticker", "nav"]])
+
 
 # Write NAV to database
 # -------------------------------------------------

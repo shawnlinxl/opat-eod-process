@@ -33,6 +33,6 @@ pnl = trades.groupby("account").apply(opat.portfolio.create_pnl, prices=prices).
 pnl = pnl[["tradeday", "account", "ticker", "pnl"]]
 pnl["pnl"] = round(pnl["pnl"], 6)
 
-# Write holdings to database
+# Write pnl to database
 # -------------------------------------------------
 pnl.to_sql(name="eod_pnl", con=DB_CON, if_exists="replace", index=False)

@@ -17,6 +17,11 @@ pipeline {
         build 'create_pnl'
       }
     }
+    stage('Create EOD nav') {
+      steps {
+        build 'create_nav'
+      }
+    }
     stage('Backup DB') {
       steps {
         build 'database_backup'

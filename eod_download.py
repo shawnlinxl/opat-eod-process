@@ -1,4 +1,5 @@
 import time
+import numpy as np
 import pandas as pd
 import sqlalchemy as db
 import yaml
@@ -25,6 +26,7 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 TICKER_LIST = pd.read_sql_query(
     sql="SELECT DISTINCT ticker FROM DW.trades", con=DB_CON)
 TICKER_LIST = TICKER_LIST["ticker"].values
+TICKER_LIST = np.append(TICKER_LIST, ["SPY", "URTH"])
 
 # Download data
 # -------------------------------------------------

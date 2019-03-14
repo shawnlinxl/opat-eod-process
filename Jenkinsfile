@@ -1,10 +1,6 @@
 pipeline {
   agent any
 
-  triggers {
-    cron('30 16 * * 1-5')
-  }
-
   stages {
     stage('Download EOD prices') {
       steps {
@@ -19,6 +15,11 @@ pipeline {
     stage('Create EOD pnl') {
       steps {
         build 'create_pnl'
+      }
+    }
+    stage('Create EOD nav') {
+      steps {
+        build 'create_nav'
       }
     }
     stage('Backup DB') {

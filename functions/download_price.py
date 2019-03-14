@@ -4,7 +4,7 @@ import pandas as pd
 import yaml
 
 with open("./config.yml", "r") as cfgfile:
-    cfg = yaml.load(cfgfile)
+    cfg = yaml.load(cfgfile, Loader=yaml.FullLoader)
 
 # Alpha Vantage
 API_KEY = cfg["api_key"][0]

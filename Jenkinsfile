@@ -22,6 +22,11 @@ pipeline {
         build 'create_nav'
       }
     }
+    stage('Create EOD attribution') {
+      steps {
+        build 'create_attribution'
+      }
+    }
     stage('Backup DB') {
       steps {
         build 'database_backup'

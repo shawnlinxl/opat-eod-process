@@ -25,9 +25,12 @@ attr = pd.read_sql_query(sql="SELECT tradeday, account, ticker, attr FROM DW.eod
 
 nav = pd.read_sql_query(sql="SELECT tradeday, account, SUM(nav) AS nav FROM DW.eod_nav GROUP BY tradeday, account", con=DB_CON)
 
+holdings = pd.read_sql_query(sql="SELECT * FROM DW.eod_holdings;", con=DB_CON)
+
 prices = pd.read_sql_query(sql="SELECT * FROM DW.eod_price;", con=DB_CON)
 
-holdings = pd.read_sql_query(sql="SELECT * FROM DW.eod_holdings;", con=DB_CON)
+prices = prices[prices["ticker"].isin(holdings["ticker"].values)]
+
 
 
 # Write to csv files 

@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import sqlalchemy as db
 import yaml
@@ -29,7 +30,7 @@ holdings = pd.read_sql_query(sql="SELECT * FROM DW.eod_holdings;", con=DB_CON)
 
 prices = pd.read_sql_query(sql="SELECT * FROM DW.eod_price;", con=DB_CON)
 
-prices = prices[prices["ticker"].isin(holdings["ticker"].values)]
+prices = prices[prices["ticker"].isin(np.append(holdings["ticker"].values, ["SPY", "URTH"]))]
 
 
 

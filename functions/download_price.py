@@ -24,7 +24,7 @@ def download_price(ticker):
               "apikey": API_KEY}
 
     # Request data from Alpha Vantage
-    r = requests.get(url=API_URL, params=PARAMS, timeout=5)
+    r = requests.get(url=API_URL, params=PARAMS, timeout=15)
 
     # Serialize result into json
     data = r.json()

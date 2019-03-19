@@ -38,5 +38,5 @@ for i, ticker in enumerate(TICKER_LIST):
                                 con=DB_CON, if_exists="append", index=False)
             success = True
         except:
-            time.sleep(60)
+            time.sleep(100)
 

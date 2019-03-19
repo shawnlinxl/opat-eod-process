@@ -25,7 +25,7 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # Ticker list to query data for
 TICKER_LIST = pd.read_sql_query(
     sql="SELECT DISTINCT Symbol FROM config.spx_components", con=DB_CON)
-TICKER_LIST = TICKER_LIST["Symbol"].values
+TICKER_LIST = TICKER_LIST["Symbol"].values[0:499]
 
 # Download data
 # -------------------------------------------------

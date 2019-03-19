@@ -4,6 +4,7 @@ import sqlalchemy as db
 import yaml
 
 from functions.download_price import download_price
+from functions.progress_bar import progress_bar
 
 # Load configuration file
 with open("config.yml", "r") as cfgfile:
@@ -30,6 +31,7 @@ TICKER_LIST = TICKER_LIST["Symbol"].values
 # -------------------------------------------------
 for i, ticker in enumerate(TICKER_LIST):
 
+    progress_bar(i, len(TICKER_LIST), prefix=ticker)
     success = False
     while not success:
         try:

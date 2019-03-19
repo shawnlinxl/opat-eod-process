@@ -25,7 +25,7 @@ DB_CON = db.create_engine("mysql+pymysql://{user}:{password}@{host}:{port}/{data
 # Ticker list to query data for
 TICKER_LIST = pd.read_sql_query(
     sql="SELECT DISTINCT Symbol FROM config.spx_components", con=DB_CON)
-TICKER_LIST = TICKER_LIST["Symbol"].values[0:499]
+TICKER_LIST = TICKER_LIST["Symbol"]
 
 # Download data
 # -------------------------------------------------
@@ -33,6 +33,7 @@ for i, ticker in enumerate(TICKER_LIST):
 
     progress_bar(i, len(TICKER_LIST), prefix=ticker)
     success = False
+    first_fail = True
     while not success:
         try:
             price_series = download_price(ticker=ticker)
@@ -40,5 +41,9 @@ for i, ticker in enumerate(TICKER_LIST):
                                 con=DB_CON, if_exists="append", index=False)
             success = True
         except:
-            time.sleep(100)
+            if not first_fail:
+                success = True # Pass unavailable tickers
+            else:
+                time.sleep(60)
+                first_fail = False
 

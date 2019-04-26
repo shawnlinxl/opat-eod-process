@@ -2,9 +2,15 @@ pipeline {
   agent any
 
   stages {
+
     stage('Download EOD prices') {
       steps {
         build 'stock_price_download'
+      }
+    }
+    stage('Create Price') {
+      steps {
+        build 'create_price'
       }
     }
     stage('Create EOD holdings') {
@@ -24,12 +30,12 @@ pipeline {
     }
     stage('Create EOD attribution') {
       steps {
-        build 'create_attribution'
+        build 'create_attr'
       }
     }
-    stage('Backup DB') {
+    stage('Export CSV') {
       steps {
-        build 'database_backup'
+        build 'export_csv'
       }
     }
   }

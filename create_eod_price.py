@@ -49,7 +49,7 @@ SELECT tradeday, ticker, open, high, low, close, adj, volume, dividend, split
 
 aprn_fix = pd.read_sql_query(sql=query, con=DB_CON)
 
-price = price.query("(price.ticker == 'APRN' & price.tradeday > '2019-08-05') | (price.ticker != 'APRN')")
+price = price.query("(ticker == 'APRN' & tradeday > '2019-08-05') | (ticker != 'APRN')")
 price = pd.concat([price, aprn_fix], ignore_index=True)
 
 # Write price data to database

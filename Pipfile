@@ -12,6 +12,7 @@ pandas = "*"
 sqlalchemy = "*"
 pymysql = "*"
 opat = ">=0.0.5.2"
+quandl = "*"
 
 [requires]
 python_version = "3.7"
